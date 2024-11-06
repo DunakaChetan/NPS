@@ -1,0 +1,39 @@
+Fast Ethernet Port Configuration 
+Router>en 
+Router#config t 
+ 
+Router(config)#int g0/0 
+Router(config-if)#ip address 10.0.0.1 255.0.0.0 
+Router(config-if)#no shut 
+Router(config-if)#exit 
+ 
+Router(config)#int g0/1 
+Router(config-if)#ip address 11.0.0.1 255.0.0.0 
+Router(config-if)#no shut 
+Router(config-if)#exit 
+
+
+ 
+RIP Configuration 
+ 
+Router(config)#router rip 
+Router(config-router)#network 10.0.0.0 
+Router(config-router)#network 11.0.0.0
+
+
+
+Static NAT Configuration 
+ 
+Router(config)#int g0/0 
+Router(config-if)#ip nat inside 
+Router(config-if)#exit 
+ 
+Router(config)#int g0/1 
+Router(config-if)#ip nat outside 
+Router(config-if)#exit 
+ 
+Router(config)#ip nat inside source static 10.0.0.2 
+100.100.100.100 
+Router(config)#exit 
+ 
+Router#debug ip nat

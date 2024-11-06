@@ -1,0 +1,3 @@
+ISL1 Question
+
+You are an IT specialist hired by a homeowner to design and implement a smart home automation system using Cisco Packet Tracer. The homeowner wants the ability to monitor and control smart devices, such as lights, fans and door locks, from both inside the house and remotely through a smartphone. The smart devices should be connected to a network via Wi-Fi, and communication between devices should be verified.

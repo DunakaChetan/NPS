@@ -1,0 +1,134 @@
+Q1:Use nano or vim to create a text file named notes.txt in your home
+  directory. Add the text "This is a test file." Save the file and exit the editor.
+  Display the contents of the file using the cat command. Provide the
+  commands and the steps taken in the text editor.and explain about all the test editors with examples.{}
+----------------------------------------
+| nano ~/notes.txt (OR) nano notes.txt |
+| This is a test file.                 |
+| Ctrl+O and enter                     |
+| Ctrl+X                               |
+| cat notes.txt                        |
+|                                      |
+|      OR                              |
+|                                      |
+| vim notes.txt                        |
+| i                                    |
+| This is a test file.                 |
+| Esc:wq                               |
+| cat notes.txt                        |
+----------------------------------------
+
+Q2:Create a file named original.txt in your home directory with some
+  sample text. Create a hard link named hardlink.txt and a soft link
+  named softlink.txt to original.txt. Verify the links by displaying
+  their details using the ls -l command. Provide the commands and the
+  output.{}
+------------------------------------------------
+| nano original.txt                            |
+| This is the original file.                   |
+| Ctrl+O and enter                             |
+| Ctrl+X                                       |
+|                                              |
+| ln original.txt hardlink.txt                 |
+|                                              |
+| ln -s original.txt softlink.txt              |
+|                                              |
+| ls -l original.txt hardlink.txt softlink.txt |
+------------------------------------------------
+
+Q3:Create a file named permissions.txt in your home directory. Set its
+   permissions to rwxr-xr--. Verify the permissions using the ls -l
+   command. Change the permissions to rw-rw-r-- and verify again.
+   Provide the commands and the output
+   Use the man command to find information about the tar command. Use
+   the info command to find information about gzip. Finally, locate the
+   documentation files for the coreutils package in /{}
+-----------------------------------------
+| nano permissions.txt                  |
+| chmod 754 permissions.txt             |
+| ls -l permissions.txt                 |
+| chmod 664 permissions.txt             |
+| ls -l permissions.txt                 |
+|                                       |
+| man tar                               |
+|                                       |
+| info gzip                             |
+|                                       |
+| locate coreutils | grep /doc/         |
+| find /usr/share/doc/coreutils -type f |
+-----------------------------------------
+
+Q4:Create a file named notes.txt. file should have 3 test sentences. Use all grep pattern to replace all occurrences of the word "test" with "example" in the file.
+   and use head and  chgrp to give all the permissions to that file. {}
+---------------------------------------------
+| nano notes.txt                            |
+| This is a test file.                      |
+| The test should be replaced.              |
+| Let's test this functionality.            |
+| sed -i 's/\btest\b/example/g' notes.txt   |
+| head -3 notes.txt                         |
+| chgrp staff notes.txt                     |
+| chmod 777 notes.txt                       |
+| ls -l notes.txt                           |
+---------------------------------------------
+
+Q5:Set the minimum password age for user1 to 7 days. Set the maximum
+   password age for user1 to 90 days. Set a password expiration warning for
+   user1 to 7 days. Verify the password aging settings.
+   Set the Minimum Password Age to 7 Days: sudo chage -m 7 user1Set the Maximum Password Age to 90 Days: sudo chage -M 90 user1
+   Set the Password Expiration Warning to 7 Days: sudo chage -W 7 user1{}
+--------------------------
+| sudo chage -m 7 user1  |
+| sudo chage -M 90 user1 |
+| sudo chage -W 7 user1  |
+| sudo chage -l user1    |
+--------------------------
+
+Q7:Create a directory named testdir. Inside testdir, create files named
+   file1.txt, file2.txt, and file3.txt. Use the tar command to create an archive
+   named testdir.tar of the testdir directory. List the contents of the
+   testdir.tar archive without extracting it.
+   Ensure testdir.tar archive from Question 1 exists. Create a directory
+   named extracted. Extract the contents of testdir.tar into the extracted
+   directory.{}
+---------------------------------------------------------------
+| mkdir testdir                                               |
+| touch testdir/file1.txt testdir/file2.txt testdir/file3.txt |
+| tar -cvf testdir.tar -C ~ testdir                           |
+| tar -tvf testdir.tar                                        |
+| mkdir extracted                                             |
+| tar -xvf testdir.tar -C extracted                           |
+| ls extracted/testdir                                        |
+---------------------------------------------------------------
+
+Q9:Create a directory named project. Inside project, create three text files: report1.txt, report2.txt, and report3.txt. Use the tar command to archive the project directory into a file named project.tar. List the contents of the project.tar archive without extracting it.
+   Create a new user named developer. Set up passwordless SSH login for developer by generating SSH keys and copying the public key to the appropriate location. Provide the commands used.{}
+---------------------------------------------------------------------
+| mkdir project                                                     |
+| touch project/report1.txt project/report2.txt project/report3.txt |
+| tar -cvf project.tar -C ~ project                                 |
+| ls project                                                        |
+| tar -tvf ~/project.tar                                            |
+| sudo useradd developer                                            | 
+| sudo passwd developer                                             |
+| ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa                        |
+| ssh-copy-id developer@hostname                                    |
+| ssh developer@hostname                                            |
+---------------------------------------------------------------------
+
+Q10:Create a new group named devops. Add the users developer and admin to the devops group. Verify the group membership by checking the /etc/group file.
+    Create a text file named sample.txt with some sample text. Compress
+    sample.txt using the gzip command. Command: gzip sample.txt. Verify
+    that the file has been compre
+-------------------------------------
+| sudo groupadd devops              |
+| sudo usermod -aG devops developer |
+| sudo usermod -aG devops admin     |
+| grep devops /etc/group            |
+| id developer                      |
+| id admin                          |
+| nano sample.txt                   |
+| This is a sample text file.       |
+| gzip sample.txt                   |
+| ls -lh sample.txt.gz              |
+-------------------------------------

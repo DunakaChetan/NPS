@@ -1,0 +1,268 @@
+::Q1::Display the IP address assigned to all network interfaces on the system.
+Show the IP address assigned to the enp0s3 interface specifically.
+Assign the IP address 10.10.10.10/24 to the enp0s3 interface and verify the changes.
+Remove the IP address 10.10.10.10/24 from the enp0s3 interface and confirm.
+Display the current routing table of the system.
+Add a static route for the network 192.168.5.0/24 via gateway 10.0.0.1 on enp0s8.
+Delete the static route added in the previous step and verify its removal.{}
+------------------------------------------------------------
+| # Display all interfaces and their IPs                   |
+| ip addr show                                             |
+|                                                          |
+| # Show IP for enp0s3                                     |
+| ip addr show dev enp0s3                                  |
+|                                                          |
+| # Assign IP to enp0s3                                    |
+| sudo ip addr add 10.10.10.10/24 dev enp0s3               |
+|                                                          |
+| # Verify the assigned IP                                 |
+| ip addr show dev enp0s3                                  |
+|                                                          |
+| # Remove IP from enp0s3                                  |
+| sudo ip addr del 10.10.10.10/24 dev enp0s3               |
+|                                                          |
+| # Verify removal                                         |
+| ip addr show dev enp0s3                                  |
+|                                                          |
+| # Display routing table                                  |
+| ip route show                                            |
+|                                                          |
+| # Add static route                                       |
+| sudo ip route add 192.168.5.0/24 via 10.0.0.1 dev enp0s8 |
+|                                                          |
+| # Delete static route                                    |
+| sudo ip route del 192.168.5.0/24 via 10.0.0.1 dev enp0s8 |
+|                                                          |
+| # Verify removal of static route                         |
+| ip route show                                            |
+------------------------------------------------------------
+
+::Q2::Bring the enp0s3 interface online and confirm its active status.
+Bring the enp0s3 interface offline and check that it is inactive.
+Assign an IP address of 192.168.50.10/24 to the enp0s3 interface.
+Remove the assigned IP address from the enp0s3 interface.
+Display the statistics for the enp0s3 interface, including packet errors and dropped packets.{}
+-------------------------------------------------------------------------
+| # Bring the enp0s3 interface online                                   |
+| sudo ip link set enp0s3 up                                            |
+|                                                                       |
+| # Confirm it is online (active)                                       |
+| ip link show enp0s3                                                   |
+|                                                                       |
+| # Bring the enp0s3 interface offline                                  |
+| sudo ip link set enp0s3 down                                          |
+|                                                                       |
+| # Confirm it is offline (inactive)                                    |
+| ip link show enp0s3                                                   |
+|                                                                       |
+| # Assign IP address 192.168.50.10/24 to enp0s3                        |
+| sudo ip addr add 192.168.50.10/24 dev enp0s3                          |
+|                                                                       |
+| # Remove the assigned IP address                                      |
+| sudo ip addr del 192.168.50.10/24 dev enp0s3                          |
+|                                                                       |
+| # Display interface statistics (including errors and dropped packets) |
+| ip -s link show enp0s3                                                |
+-------------------------------------------------------------------------
+
+::Q3::Install the nginx package from the Red Hat Network using the dnf package manager.
+Update the nginx package to the latest version available from the remote repository using dnf.
+Install an RPM package called mypackage.rpm located in /home/user/ using dnf.{}
+--------------------------------------------------------------------
+| # Install nginx from the Red Hat Network                         |
+| sudo dnf install nginx                                           |
+|                                                                  |
+| # Update nginx to the latest version available in the repository |
+| sudo dnf update nginx                                            |
+|                                                                  |
+| # Install a local RPM package (mypackage.rpm) from /home/user/   |
+| sudo dnf install /home/user/mypackage.rpm                        |
+--------------------------------------------------------------------
+
+::Q4::Check the current status of firewalld on the system.
+List all the zones available in firewalld.
+Create a custom zone named webzone and configure it to allow HTTP traffic.
+Open port 8080/tcp in the public zone using firewalld.
+Block traffic from the IP address 192.168.1.50 and allow traffic only from 192.168.1.100 in the public zone.{}
+-----------------------------------------------------------------------------------
+| # Check the current status of firewalld                                           |
+| sudo firewall-cmd --state                                                         |
+|                                                                                   |
+| # List available zones                                                            |
+| sudo firewall-cmd --list-zones                                                    |
+|                                                                                   |
+| # Create custom zone and allow HTTP traffic                                       |
+| sudo firewall-cmd --permanent --new-zone=webzone                                  |
+| sudo firewall-cmd --permanent --zone=webzone --add-service=http                   |
+|                                                                                   |
+| # Open port 8080/tcp in the public zone                                           |
+| sudo firewall-cmd --permanent --zone=public --add-port=8080/tcp                   |
+|                                                                                   |
+| # Block traffic from 192.168.1.50 and allow only 192.168.1.100 in the public zone |
+| sudo firewall-cmd --permanent --zone=public --add-source=192.168.1.100            |
+| sudo firewall-cmd --permanent --zone=public --remove-source=192.168.1.50          |
+|                                                                                   |
+| # Reload to apply changes                                                         |
+| sudo firewall-cmd --reload                                                        |
+-----------------------------------------------------------------------------------
+
+::Q5::Search for a container image called nginx using the podman command.
+Pull the nginx container image from a public registry using podman.
+List all local container images available on the system using podman.
+Inspect the details of the nginx container image using the podman command.
+Remove the nginx container image from the local system using podman.
+Use Skopeo to copy a container image from one registry to another without pulling it locally.
+Inspect a remote container image (e.g., nginx) using Skopeo without downloading it.
+Remove all unused container images on the system using podman.{}
+-----------------------------------------------------------------------------------
+| # Search for nginx image on a public registry                                   |
+| podman search nginx                                                             |
+|                                                                                 |
+| # Pull the nginx container image from a public registry                         |
+| podman pull nginx                                                               |
+|                                                                                 |
+| # List all local container images available                                     |
+| podman images                                                                   |
+|                                                                                 |
+| # Inspect the nginx container image                                             |
+| podman image inspect nginx                                                      |
+|                                                                                 |
+| # Remove the nginx container image from the local system                        |
+| podman rmi nginx                                                                |
+|                                                                                 |
+| # Use Skopeo to copy the nginx container image from one registry to another     |
+| skopeo copy docker://docker.io/library/nginx docker://your-registry.local/nginx |
+|                                                                                 |
+| # Inspect the nginx container image remotely with Skopeo                        |
+| skopeo inspect docker://docker.io/library/nginx                                 |
+|                                                                                 |
+| # Remove all unused container images with Podman                                |
+| podman image prune                                                              |
+|                                                                                 |
+| # Remove all container images from the system                                   |
+| podman rmi -a                                                                   |
+-----------------------------------------------------------------------------------
+
+::Q6::Write a Containerfile to build a custom container for a simple Node.js web application.
+Build a custom container image from the Containerfile using podman.
+Run a container from the custom image and ensure it is running properly.
+Verify that the application inside the container is accessible by checking port 3000.
+View the logs of a running container using the appropriate podman command.
+Stop and remove the running container from the system.{}
+----------------------------------------------------------
+| # Build the custom container image                     |
+| podman build -t my-node-app .                          |
+|                                                        |
+| # Run the container in detached mode and map port 3000 |
+| podman run -d -p 3000:3000 --name node-app my-node-app |
+|                                                        |
+| # Verify the app is accessible (curl or browser)       |
+|curl http://localhost:3000                              |
+|                                                        |
+| # View the logs of the running container               |
+| podman logs node-app                                   |
+|                                                        |
+| # Stop the running container                           |
+| podman stop node-app                                   |
+|                                                        |
+| # Remove the stopped container                         |
+| podman rm node-app                                     |
+----------------------------------------------------------
+
+::Q7::Configure multiple IP addresses (192.168.1.100/24 and 10.0.0.50/24) on the enp0s8 interface and verify the configuration.
+Set up a persistent static route for 192.168.2.0/24 via 10.0.0.1 on enp0s3 that remains active after a reboot.
+Configure the default gateway for your system to 192.168.1.1 and verify the routing table changes.
+Write the command to display the DNS servers used by the system for name resolution.
+Network Diagnostics and Monitoring{}
+------------------------------------------------------------------------------
+| # Configure multiple IP addresses on enp0s8                                |
+| sudo ip addr add 192.168.1.100/24 dev enp0s8                               |
+|sudo ip addr add 10.0.0.50/24 dev enp0s8                                    |
+|                                                                            |
+| # Verify the IP addresses configuration                                    |
+| ip addr show enp0s8                                                        |
+|                                                                            |
+| # Set up persistent static route for 192.168.2.0/24 via 10.0.0.1 on enp0s3 |
+| sudo nmcli connection modify enp0s3 +ipv4.routes "192.168.2.0/24 10.0.0.1" |
+|                                                                            |
+| # Set the default gateway to 192.168.1.1                                   |
+| sudo ip route add default via 192.168.1.1                                  |
+|                                                                            |
+| # Verify routing table                                                     |
+| ip route show                                                              |
+|                                                                            |
+| # Display the DNS servers used by the system                               |
+| cat /etc/resolv.conf                                                       |
+|                                                                            |
+| # Network diagnostics: Ping and traceroute to check connectivity           |
+| ping 8.8.8.8                                                               |
+| traceroute 8.8.8.8                                                         |
+|                                                                            |
+| # Monitor network traffic in real-time                                     | 
+| iftop                                                                      |
+------------------------------------------------------------------------------
+
+::Q8::Use the ping command to test network connectivity to google.com and restrict the test to 5 packets.
+Display active network connections and listening ports on the system using the ss or netstat command.
+Use the traceroute command to trace the path packets take to reach example.com.
+Write a command to monitor real-time traffic statistics on the enp0s3 interface.
+Use the tcpdump command to capture network traffic on the enp0s8 interface and save it to a file called capture.pcap.{}
+----------------------------------------------------------------------
+| # 1. Test network connectivity to google.com with 5 packets        |
+| ping -c 5 google.com                                               |
+|                                                                    |
+| # 2. Display active network connections and listening ports        |
+| ss -tuln        # Or alternatively: netstat -tuln                  |
+|                                                                    |
+| # 3. Trace the path packets take to reach example.com              |
+| traceroute example.com                                             |
+|                                                                    |
+| # 4. Monitor real-time traffic statistics on the enp0s3 interface  |
+| sudo iftop -i enp0s3                                               |
+|                                                                    |
+| # 5. Capture network traffic on enp0s8 and save it to capture.pcap |
+| sudo tcpdump -i enp0s8 -w capture.pcap                             |
+----------------------------------------------------------------------
+
+::Q9::Enable a specific repository (e.g., epel) on your CentOS system and verify that it is enabled.
+List all available updates for installed packages on your system using dnf.
+Use dnf to remove the package httpd and its dependencies from your system.
+Lock the version of the nginx package to ensure it does not get automatically updated during a system upgrade.
+Show the history of package installations and updates performed using dnf.{}
+-----------------------------------------------------------------------
+| # 1. Enable the epel repository and verify it's enabled             |
+| sudo dnf install epel-release                                       |
+| dnf repolist enabled | grep epel                                    |
+|                                                                     |
+| # 2. List all available updates for installed packages              |
+| dnf check-update                                                    |
+|                                                                     |
+| # 3. Remove the httpd package and its dependencies                  |
+| sudo dnf remove httpd                                               |
+|                                                                     |
+| # 4. Lock the version of the nginx package                          |
+| sudo dnf install dnf-plugins-core   # If not installed              |
+| sudo dnf versionlock add nginx                                      |
+| dnf versionlock list  # Verify that nginx is locked                 |
+|                                                                     |
+| # 5. Show the history of package installations and updates          |
+| dnf history                                                         |
+| dnf history info <transaction-id>   # For detailed transaction info |
+-----------------------------------------------------------------------
+
+::Q10::Disable the firewalld service on your CentOS system and ensure it does not start automatically on r
+--------------------------------------------------------------------------
+| # 1. Stop the firewalld service                                        |
+| sudo systemctl stop firewalld                                          |
+|                                                                        |
+| # 2. Disable the firewalld service from starting at boot               | 
+| sudo systemctl disable firewalld                                       |
+|                                                                        |
+| # 3. Verify that firewalld is disabled                                 |
+| sudo systemctl is-enabled firewalld  # Should return 'disabled'        |
+|                                                                        |
+| # 4. Check the status of the firewalld service                         |
+| sudo systemctl status firewalld  # Should show 'inactive' or 'stopped' |
+--------------------------------------------------------------------------
+
+

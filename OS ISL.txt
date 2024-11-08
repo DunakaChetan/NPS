@@ -1,0 +1,383 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. Write a program for implementing process management using the following system calls of the UNIX operating system: fork, exec, getpid, exit, wait, close
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+
+int main() {
+    pid_t pid;
+    int status;
+    int fileDescriptor;
+
+    // Step 1: Open a file to demonstrate file descriptor operations
+    fileDescriptor = open("sample_file.txt", O_CREAT | O_WRONLY, 0644);
+    if (fileDescriptor == -1) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    // Step 2: Fork the process
+    pid = fork();
+    
+    if (pid == -1) {
+        // Error occurred during fork
+        perror("Fork failed");
+        close(fileDescriptor);
+        exit(EXIT_FAILURE);
+    }
+
+    if (pid == 0) {
+        // Child process
+        printf("Child process: PID = %d, Parent PID = %d\n", getpid(), getppid());
+
+        // Step 3: Execute a new program using exec()
+        execlp("ls", "ls", "-l", NULL);
+
+        // If execlp fails
+        perror("execlp failed");
+        close(fileDescriptor);
+        exit(EXIT_FAILURE);
+    } else {
+        // Parent process
+        printf("Parent process: PID = %d, Child PID = %d\n", getpid(), pid);
+
+        // Step 4: Wait for child process to finish
+        wait(&status);
+
+        if (WIFEXITED(status)) {
+            printf("Child process exited with status: %d\n", WEXITSTATUS(status));
+        }
+
+        // Step 5: Close the file descriptor in the parent process
+        close(fileDescriptor);
+        
+        // Exit the parent process
+        exit(EXIT_SUCCESS);
+    }
+
+    return 0;
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. To write a program for implementing Directory management using the following system calls of the UNIX operating system: opendir, readdir
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>  // For opendir, readdir, and closedir
+#include <string.h>
+
+void list_directory(const char *path) {
+    DIR *dir = opendir(path);  // Open the directory
+    if (dir == NULL) {
+        perror("opendir failed");
+        return;
+    }
+
+    struct dirent *entry;
+    
+    // Read entries from the directory and print their names
+    while ((entry = readdir(dir)) != NULL) {
+        // Skip the "." and ".." directories (current and parent directories)
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            printf("%s\n", entry->d_name);
+        }
+    }
+
+    // Close the directory when done
+    closedir(dir);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <directory_path>\n", argv[0]);
+        return 1;
+    }
+
+    const char *directory_path = argv[1];
+
+    printf("Listing contents of directory: %s\n", directory_path);
+    list_directory(directory_path);
+
+    return 0;
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Write a C program to implement the FCFS process scheduling algorithm. 
+
+#include <stdio.h>
+
+typedef struct {
+    int pid;            // Process ID
+    int arrival_time;   // Arrival Time
+    int burst_time;     // Burst Time
+    int completion_time; // Completion Time
+    int turnaround_time; // Turnaround Time
+    int waiting_time;    // Waiting Time
+} Process;
+
+// Function to calculate the Completion Time, Turnaround Time, and Waiting Time
+void calculateTimes(Process processes[], int n) {
+    processes[0].completion_time = processes[0].arrival_time + processes[0].burst_time;
+    
+    // Calculate the completion time for each process
+    for (int i = 1; i < n; i++) {
+        if (processes[i].arrival_time > processes[i - 1].completion_time) {
+            processes[i].completion_time = processes[i].arrival_time + processes[i].burst_time;
+        } else {
+            processes[i].completion_time = processes[i - 1].completion_time + processes[i].burst_time;
+        }
+    }
+
+    // Calculate Turnaround Time and Waiting Time
+    for (int i = 0; i < n; i++) {
+        processes[i].turnaround_time = processes[i].completion_time - processes[i].arrival_time;
+        processes[i].waiting_time = processes[i].turnaround_time - processes[i].burst_time;
+    }
+}
+
+// Function to print the process details and statistics
+void printProcessDetails(Process processes[], int n) {
+    printf("PID\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n", 
+                processes[i].pid, processes[i].arrival_time, processes[i].burst_time,
+                processes[i].completion_time, processes[i].turnaround_time, processes[i].waiting_time);
+    }
+}
+
+// Function to calculate the average waiting and turnaround times
+void calculateAverages(Process processes[], int n) {
+    float total_waiting_time = 0, total_turnaround_time = 0;
+    
+    for (int i = 0; i < n; i++) {
+        total_waiting_time += processes[i].waiting_time;
+        total_turnaround_time += processes[i].turnaround_time;
+    }
+
+    printf("\nAverage Waiting Time: %.2f\n", total_waiting_time / n);
+    printf("Average Turnaround Time: %.2f\n", total_turnaround_time / n);
+}
+
+int main() {
+    int n;
+
+    // Get the number of processes
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    Process processes[n];
+
+    // Input process details (Arrival time and Burst time)
+    for (int i = 0; i < n; i++) {
+        processes[i].pid = i + 1;  // Assign PID starting from 1
+        printf("\nEnter Arrival Time and Burst Time for Process %d:\n", i + 1);
+        printf("Arrival Time: ");
+        scanf("%d", &processes[i].arrival_time);
+        printf("Burst Time: ");
+        scanf("%d", &processes[i].burst_time);
+    }
+
+    // Calculate Completion Time, Turnaround Time, and Waiting Time
+    calculateTimes(processes, n);
+
+    // Print Process details
+    printProcessDetails(processes, n);
+
+    // Calculate and print average waiting and turnaround times
+    calculateAverages(processes, n);
+
+    return 0;
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+4. Write a C program to implement the SJF process scheduling algorithm.
+
+#include <stdio.h>
+
+struct Process {
+    int pid;        // Process ID
+    int bt;         // Burst time
+    int wt;         // Waiting time
+    int tat;        // Turnaround time
+};
+
+// Function to sort processes based on burst time (SJF algorithm)
+void sortProcesses(struct Process proc[], int n) {
+    struct Process temp;
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (proc[i].bt > proc[j].bt) {
+                // Swap the processes
+                temp = proc[i];
+                proc[i] = proc[j];
+                proc[j] = temp;
+            }
+        }
+    }
+}
+
+// Function to calculate waiting time and turnaround time
+void findWaitingTime(struct Process proc[], int n) {
+    proc[0].wt = 0;  // First process has no waiting time
+
+    // Calculate waiting time for each process
+    for (int i = 1; i < n; i++) {
+        proc[i].wt = proc[i - 1].bt + proc[i - 1].wt;
+    }
+}
+
+void findTurnaroundTime(struct Process proc[], int n) {
+    // Turnaround time is burst time + waiting time
+    for (int i = 0; i < n; i++) {
+        proc[i].tat = proc[i].bt + proc[i].wt;
+    }
+}
+
+void findAvgTime(struct Process proc[], int n) {
+    int total_wt = 0, total_tat = 0;
+
+    // Calculate total waiting time and total turnaround time
+    for (int i = 0; i < n; i++) {
+        total_wt += proc[i].wt;
+        total_tat += proc[i].tat;
+    }
+
+    // Print the results
+    printf("\nProcess ID\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t\t%d\t\t%d\t\t%d\n", proc[i].pid, proc[i].bt, proc[i].wt, proc[i].tat);
+    }
+
+    // Calculate and print average times
+    printf("\nAverage Waiting Time: %.2f", (float)total_wt / n);
+    printf("\nAverage Turnaround Time: %.2f", (float)total_tat / n);
+}
+
+int main() {
+    int n;
+
+    // Input number of processes
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    struct Process proc[n];
+
+    // Input process details (ID and burst time)
+    for (int i = 0; i < n; i++) {
+        proc[i].pid = i + 1;  // Assign process ID starting from 1
+        printf("\nEnter burst time for process %d: ", proc[i].pid);
+        scanf("%d", &proc[i].bt);
+    }
+
+    // Sort processes by burst time
+    sortProcesses(proc, n);
+
+    // Calculate waiting time and turnaround time
+    findWaitingTime(proc, n);
+    findTurnaroundTime(proc, n);
+
+    // Calculate and display average waiting time and turnaround time
+    findAvgTime(proc, n);
+
+    return 0;
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Write a C program to implement the Round Robin process scheduling algorithm.
+
+#include <stdio.h>
+
+#define MAX_PROCESSES 10
+
+// Structure to represent each process
+struct Process {
+    int id;              // Process ID
+    int burst_time;      // Burst time (time required by process)
+    int waiting_time;    // Waiting time
+    int turnaround_time; // Turnaround time
+    int remaining_time;  // Remaining burst time (for round robin)
+};
+
+// Function to calculate waiting time and turnaround time
+void findWaitingAndTurnaroundTimes(struct Process processes[], int n, int time_quantum) {
+    int time = 0;  // Current time
+    int remaining_processes = n;  // Number of remaining processes to finish
+
+    while (remaining_processes > 0) {
+        for (int i = 0; i < n; i++) {
+            // Check if process has remaining burst time
+            if (processes[i].remaining_time > 0) {
+                // If remaining time is greater than time quantum, execute the process for time quantum
+                if (processes[i].remaining_time > time_quantum) {
+                    time += time_quantum;
+                    processes[i].remaining_time -= time_quantum;
+                } else {  // If remaining time is less than or equal to time quantum
+                    time += processes[i].remaining_time;
+                    processes[i].waiting_time = time - processes[i].burst_time;
+                    processes[i].turnaround_time = time;
+                    processes[i].remaining_time = 0;  // Process has finished
+                    remaining_processes--;  // Process is completed
+                }
+            }
+        }
+    }
+}
+
+// Function to calculate average waiting time and average turnaround time
+void calculateAverageTimes(struct Process processes[], int n) {
+    int total_waiting_time = 0;
+    int total_turnaround_time = 0;
+
+    for (int i = 0; i < n; i++) {
+        total_waiting_time += processes[i].waiting_time;
+        total_turnaround_time += processes[i].turnaround_time;
+    }
+
+    printf("\nAverage Waiting Time: %.2f", (float)total_waiting_time / n);
+    printf("\nAverage Turnaround Time: %.2f", (float)total_turnaround_time / n);
+}
+
+int main() {
+    struct Process processes[MAX_PROCESSES];
+    int n, time_quantum;
+
+    // Input the number of processes
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    // Input the burst time for each process
+    for (int i = 0; i < n; i++) {
+        processes[i].id = i + 1;
+        printf("Enter burst time for process %d: ", i + 1);
+        scanf("%d", &processes[i].burst_time);
+        processes[i].remaining_time = processes[i].burst_time;  // Initially, remaining time equals burst time
+    }
+
+    // Input the time quantum
+    printf("Enter the time quantum: ");
+    scanf("%d", &time_quantum);
+
+    // Calculate waiting time and turnaround time for each process
+    findWaitingAndTurnaroundTimes(processes, n, time_quantum);
+
+    // Output the results
+    printf("\nProcess ID\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t\t%d\t\t%d\t\t%d\n", processes[i].id, processes[i].burst_time, processes[i].waiting_time, processes[i].turnaround_time);
+    }
+
+    // Calculate and display average waiting time and turnaround time
+    calculateAverageTimes(processes, n);
+
+    return 0;
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
